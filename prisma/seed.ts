@@ -5,17 +5,13 @@ const prisma = new PrismaClient();
 
 async function manageUsers() {
   const creatorUser = {
-    name: 'Criador',
     email: 'criador@afiliados.com',
-    phone: '(84) 91111-0000',
     role: Role.CREATOR,
     password: hashPassword('Aa123456789*'),
   };
 
   const afilliatedUser = {
-    name: 'Afiliado',
     email: 'afiliado@afiliados.com',
-    phone: '(84) 91111-0000',
     role: Role.AFFILIATED,
     password: hashPassword('Aa123456789*'),
   };

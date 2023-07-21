@@ -1,5 +1,5 @@
 # Node.js image
-FROM node:20.4
+FROM node:18.17.0
 
 # work directory
 WORKDIR /app
@@ -7,7 +7,11 @@ WORKDIR /app
 # Install dependencies
 COPY package.json .
 COPY package-lock.json .
-RUN npm install
+COPY ./tsconfig.json .
+COPY ./tsconfig.build.json .
+COPY ./nest-cli.json .
+
+RUN yarn install && yarn cache clean
 
 # Copy source code
 COPY src/ .

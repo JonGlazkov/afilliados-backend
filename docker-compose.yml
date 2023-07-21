@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    image: postgres
+    image: postgres:alpine
     container_name: postgres_server
     ports:
       - '5432:5432'
@@ -10,7 +10,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      
+
   api:
     build: .
     container_name: node_afiliados
@@ -23,4 +23,4 @@ services:
     env_file:
       - .env
     command: >
-      sh -c "echo 'Please wait the migrations ran' && sleep 10 && python manage.py migrate && python manage.py test && python manage.py runserver 0.0.0.0:8000"
+      sh -c "echo 'Please wait the migrations ran' && npx prisma generate --schema ./prisma/schema.prisma && yarn build && yarn migration:run && yarn start:prod"
