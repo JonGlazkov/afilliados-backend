@@ -26,9 +26,25 @@ async function manageUsers() {
     });
 
     if (!doesItExist) {
-      await prisma.users.create({
+      const createdUser = await prisma.users.create({
         data: user,
       });
+
+      if (createdUser.role === Role.AFFILIATED) {
+        await prisma.affiliate.create({
+          data: {
+            name: 'Afiliado Jon',
+            userId: createdUser.id,
+          },
+        });
+      } else if (createdUser.role === Role.CREATOR) {
+        await prisma.creator.create({
+          data: {
+            name: 'Criador Jon',
+            userId: createdUser.id,
+          },
+        });
+      }
     }
   }
 }
