@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  password   String
+  role       Role        @default(CREATOR)
+  creators   Creator[]
+  affiliates Affiliate[]
+}
+
+model Creator {
+  id       Int       @id @default(autoincrement())
+  name     String
+  userId   Int // 
+  user     Users     @relation(fields: [userId], references: [id])
+  products Product[]
+}
+
+model Product {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  price       Int
+  commission  Int
+  creatorId   Int
+  creator     Creator       @relation(fields: [creatorId], references: [id])
+  affiliates  Affiliate[]
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  type      Int
+  date      DateTime
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  value     Int
+  seller    String
+}
+
+model Affiliate {
+  id       Int       @id @default(autoincrement())
+  name     String
+  userId   Int
+  user     Users     @relation(fields: [userId], references: [id])
+  products Product[]
+}
+
+enum Role {
+  AFFILIATED
+  CREATOR
+}
