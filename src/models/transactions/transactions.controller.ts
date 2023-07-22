@@ -1,5 +1,7 @@
 import {
   Controller,
+  Delete,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -9,11 +11,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { TransactionService } from './transactions.service';
-import { diskStorage } from 'multer';
-import { Readable } from 'stream';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
-@Controller('transaction')
+@Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
@@ -24,9 +23,29 @@ export class TransactionController {
       throw new HttpException('File not provided', HttpStatus.BAD_REQUEST);
     }
 
-    const response = await this.transactionService.processSalesFile(
+    const response = await this.transactionService.processTransactionsFile(
       file.buffer,
     );
     return response;
+  }
+
+  @Get()
+  async listTransactions(): Promise<any> {
+    const transactions = await this.transactionService.listTransactions();
+
+    if (!transactions) {
+      return 'No transactions';
+    }
+
+    const total = transactions.reduce(
+      (sum, transaction) => sum + transaction.value,
+      0,
+    );
+
+    return { transactions, total };
+  }
+  @Delete()
+  async deleteTransactions() {
+    await this.transactionService.deleteTransactions();
   }
 }

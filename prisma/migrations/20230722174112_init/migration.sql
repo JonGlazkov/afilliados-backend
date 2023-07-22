@@ -9,8 +9,11 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "Seller" (
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "role" INTEGER NOT NULL
+    "role" INTEGER NOT NULL,
+
+    CONSTRAINT "Seller_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -22,6 +25,7 @@ CREATE TABLE "transaction" (
     "value" INTEGER NOT NULL,
     "sellerType" INTEGER NOT NULL,
     "sellerName" TEXT,
+    "sellerId" TEXT,
 
     CONSTRAINT "transaction_pkey" PRIMARY KEY ("id")
 );
@@ -29,8 +33,5 @@ CREATE TABLE "transaction" (
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Seller_name_key" ON "Seller"("name");
-
 -- AddForeignKey
-ALTER TABLE "transaction" ADD CONSTRAINT "transaction_sellerName_fkey" FOREIGN KEY ("sellerName") REFERENCES "Seller"("name") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "transaction" ADD CONSTRAINT "transaction_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "Seller"("id") ON DELETE SET NULL ON UPDATE CASCADE;

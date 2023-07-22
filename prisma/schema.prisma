@@ -17,7 +17,8 @@ model Users {
 }
 
 model Seller {
-  name         String        @unique
+  id           String        @id @default(uuid())
+  name         String
   role         Int
   transactions Transaction[]
 }
@@ -30,7 +31,8 @@ model Transaction {
   value           Int
   sellerType      Int
   sellerName      String?
-  seller          Seller?  @relation(fields: [sellerName], references: [name])
+  sellerId        String?
+  seller          Seller?  @relation(fields: [sellerId], references: [id])
 
   @@map("transaction")
 }

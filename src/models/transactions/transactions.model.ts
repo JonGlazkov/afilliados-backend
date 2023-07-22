@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Seller } from '@prisma/client';
 
 type sellerType = {
   1: 'CREATOR';
@@ -12,14 +12,8 @@ type transactionType = {
   4: 'COMMISSION_RECEIVED';
 };
 
-export class Transactions implements Prisma.TransactionCreateInput {
-  seller: {
-    connectOrCreate: {
-      where: Prisma.SellerWhereUniqueInput;
-
-      create: Prisma.SellerCreateWithoutTransactionsInput;
-    };
-  };
+export class Transactions {
+  sellerName: string;
   sellerType: number;
   product: string;
   value: number;
