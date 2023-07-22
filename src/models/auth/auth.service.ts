@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Users } from '@prisma/client';
 import { UnauthorizedException } from '@nestjs/common';
 import { AuthLoginDto } from './entity/login.dto';
-import { ChangePasswordInput } from './entity/change-password.input';
 import { passwordValidator } from 'src/common/helpers/passwordValidator';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role,
     };
     return {
       access_token: this.jwtService.sign(payload),
@@ -40,39 +38,5 @@ export class AuthService {
   async getAccount(access_token: string): Promise<any> {
     const user = this.jwtService.decode(access_token, { json: true });
     return user;
-  }
-
-  async changePassword(
-    id: string,
-    data: ChangePasswordInput,
-  ): Promise<Users | any> {
-    const findUser = await this.prisma.users.findFirst({
-      where: {
-        id,
-      },
-    });
-
-    if (!findUser) throw new BadRequestException('Este usuário não existe');
-
-    if (data.password !== data.confirmationPassword)
-      throw new BadRequestException('As senhas estão diferentes');
-
-    const validatePassword = passwordValidator(data.password);
-
-    if (!validatePassword.passed)
-      throw new BadRequestException(validatePassword.error);
-
-    delete data.confirmationPassword;
-    const password = hashPassword(data.password);
-    data.password = password;
-
-    return await this.prisma.users.update({
-      where: {
-        id,
-      },
-      data: {
-        password: data.password,
-      },
-    });
   }
 }

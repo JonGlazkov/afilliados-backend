@@ -9,62 +9,28 @@ datasource db {
 }
 
 model Users {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  password   String
-  role       Role        @default(CREATOR)
-  creators   Creator[]
-  affiliates Affiliate[]
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
 
   @@map("users")
 }
 
-model Creator {
-  id       String    @id @default(uuid())
-  name     String
-  userId   String // 
-  user     Users     @relation(fields: [userId], references: [id])
-  products Product[]
-
-  @@map("creator")
-}
-
-model Product {
-  id          String        @id @default(uuid())
-  name        String        @unique
-  price       Int
-  commission  Int
-  creatorId   String
-  creator     Creator       @relation(fields: [creatorId], references: [id])
-  affiliates  Affiliate[]
-  Transaction Transaction[]
-
-  @@map("product")
+model Seller {
+  name         String        @unique
+  role         Int
+  transactions Transaction[]
 }
 
 model Transaction {
-  id        String   @id @default(uuid())
-  type      Int
-  date      DateTime
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  value     Int
-  seller    String
+  id              String   @id @default(uuid())
+  transactionType Int
+  date            DateTime
+  product         String
+  value           Int
+  sellerType      Int
+  sellerName      String?
+  seller          Seller?  @relation(fields: [sellerName], references: [name])
 
   @@map("transaction")
-}
-
-model Affiliate {
-  id       String    @id @default(uuid())
-  name     String
-  userId   String
-  user     Users     @relation(fields: [userId], references: [id])
-  products Product[]
-
-  @@map("affiliate")
-}
-
-enum Role {
-  AFFILIATED
-  CREATOR
 }
