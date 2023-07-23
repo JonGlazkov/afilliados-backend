@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -44,6 +45,24 @@ export class TransactionController {
 
     return { transactions, total };
   }
+
+  @Get(':id')
+  async listTransactionBySellerId(@Param('id') id: string): Promise<any> {
+    const transactions =
+      await this.transactionService.listTransactionBySellerId(id);
+
+    if (!transactions) {
+      return 'No transactions';
+    }
+
+    const total = transactions.reduce(
+      (sum, transaction) => sum + transaction.value,
+      0,
+    );
+
+    return { transactions, total };
+  }
+
   @Delete()
   async deleteTransactions() {
     await this.transactionService.deleteTransactions();

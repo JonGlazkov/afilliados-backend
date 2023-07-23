@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/database/prisma.service';
 import { SellerDto } from './sellers.dto';
+import { Seller } from '@prisma/client';
 
 @Injectable()
 export class SellersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<SellerDto[]> {
-    const sellers = await this.prisma.seller.findMany();
-    return sellers.map((seller) => ({ name: seller.name, role: seller.role }));
+  async findAll(): Promise<Seller[]> {
+    const sellers = await this.prisma.seller.findMany({
+      include: {
+        transactions: true,
+      },
+    });
+
+    return sellers;
   }
 
   async create(sellerDto: SellerDto): Promise<SellerDto> {

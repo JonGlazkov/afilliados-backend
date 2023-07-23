@@ -3,6 +3,7 @@ import { Prisma, Seller, Transaction } from '@prisma/client';
 import { PrismaService } from 'src/common/database/prisma.service';
 import { Transactions } from './transactions.model';
 import { async } from 'rxjs';
+import { SellersService } from '../sellers/sellers.service';
 
 @Injectable()
 export class TransactionService {
@@ -23,31 +24,16 @@ export class TransactionService {
 
       try {
         const line = fileLines[i];
-
-        // Retrieve information from file
         const transactionType = parseInt(line[0], 10);
         const purchasedDateStr = line.substring(1, 26).trim();
         const product = line.substring(26, 56).trim();
         const value = parseInt(line.substring(56, 66), 10);
         const sellerName = line.substring(66).trim();
 
-        // Datetime convert
         const purchasedDate = new Date(purchasedDateStr);
 
-        // Seller (Creator or Affiliate)
         const sellerType =
           transactionType === 2 || transactionType === 3 ? 2 : 1;
-
-        const transaction: Transactions = {
-          sellerName,
-          sellerType,
-          product,
-          value: transactionType === 3 ? -value : value,
-          date: purchasedDate, // Use Date type directly
-          transactionType,
-        };
-
-        transactionsToCreate.push(transaction);
 
         const existingSeller = await this.prisma.seller.findFirst({
           where: {
@@ -56,13 +42,29 @@ export class TransactionService {
           },
         });
 
-        // If the seller doesn't exist, create a new one
+        let sellerId: string;
+
         if (!existingSeller) {
           const newSeller = await this.prisma.seller.create({
             data: { name: sellerName, role: sellerType },
           });
           console.log('New seller created:', newSeller);
+          sellerId = newSeller.id;
+        } else {
+          sellerId = existingSeller.id;
         }
+
+        const transaction: Transactions = {
+          sellerName,
+          sellerType,
+          product,
+          value: transactionType === 3 ? -value : value,
+          date: purchasedDate,
+          transactionType,
+          sellerId,
+        };
+
+        transactionsToCreate.push(transaction);
 
         successItems.push({
           line: `${i + 1} - ${line}`,
@@ -78,8 +80,6 @@ export class TransactionService {
       }
     }
 
-    // Bulk creating SalesTransaction
-
     await this.prisma.transaction.createMany({
       data: transactionsToCreate,
     });
@@ -90,6 +90,15 @@ export class TransactionService {
 
   async listTransactions(): Promise<Transaction[]> {
     return this.prisma.transaction.findMany();
+  }
+
+  async listTransactionBySellerId(id: string): Promise<Transaction[]> {
+    return this.prisma.transaction.findMany({
+      where: {
+        sellerId: id,
+      },
+      include: { seller: true },
+    });
   }
 
   async deleteTransactions() {
