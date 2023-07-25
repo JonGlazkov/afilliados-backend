@@ -20,6 +20,6 @@ import { SellersModule } from './models/sellers/sellers.module';
     TransactionsModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
-  providers: [PrismaService, AuthService, JwtStrategy],
+  providers: [PrismaService, JwtStrategy],
 })
 export class AppModule {}

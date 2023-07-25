@@ -5,7 +5,7 @@ services:
     image: postgres:alpine
     container_name: postgres_server
     ports:
-      - '5433:5432'
+      - '5432:5432'
     environment:
       - POSTGRES_DB=${POSTGRES_DB_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -17,10 +17,11 @@ services:
     ports:
       - '3333:3333'
     volumes:
-      - ./src:/app
+      - ./prisma:/app/prisma
+      - ./src:/app/src
     depends_on:
       - db
     env_file:
       - .env
     command: >
-      sh -c "echo 'Please wait the migrations ran' && npx prisma generate --schema ./prisma/schema.prisma && yarn build && yarn db:seed && yarn migration:run"
+      sh -c "npx prisma generate --schema ./prisma/schema.prisma && yarn build && yarn migration:run && yarn db:seed && yarn start:prod "

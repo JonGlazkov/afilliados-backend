@@ -10,7 +10,7 @@ COPY ./tsconfig.json .
 COPY ./tsconfig.build.json .
 COPY ./nest-cli.json .
 
-RUN yarn install && yarn cache clean
+RUN npm install && yarn cache clean
 
 # Copy source code
 COPY src/ .
