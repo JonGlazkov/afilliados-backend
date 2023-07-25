@@ -6,6 +6,7 @@
 </i>
 
 ## About 💭
+Take a look at this video, there I explain about the challenge and I show my solution: [Click here](https://www.loom.com/embed/b6a79883a94e4674818e30c82b8d565d)
 
 First of all, make sure to have Docker already installed. After you done that, go to the following steps:
 
